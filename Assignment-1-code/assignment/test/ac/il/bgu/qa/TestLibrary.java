@@ -691,7 +691,7 @@ public class TestLibrary {
     }
 
     @Test
-    public void givenBookIsValid_whenGetBookByISBN_thenThrowException(){
+    public void givenBookIsValid_whenGetBookByISBN_thenDontThrowException(){
         // 1. Arrange
         Library library = new Library(mockDatabaseService, mockReviewService);
         // 2. Stubbing
