@@ -624,4 +624,84 @@ public class TestLibrary {
         verify(mockUser,times(2)).getName();
 
     }
+
+    @Test
+    public void givenInvalidISBN_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+    @Test
+    public void givenNullUserId_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+    @Test
+    public void givenInvalidUserId_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+    @Test
+    public void givenBookIsNotInDB_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+    @Test
+    public void givenBookIsAlreadyBorrowed_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+    @Test
+    public void givenBookIsValid_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+
+    }
+
+
 }
