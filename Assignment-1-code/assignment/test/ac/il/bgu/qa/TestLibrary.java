@@ -8,8 +8,9 @@ import ac.il.bgu.qa.errors.BookNotFoundException;
 import ac.il.bgu.qa.errors.UserNotRegisteredException;
 import ac.il.bgu.qa.services.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.*;
-
 
 public class TestLibrary {
 
@@ -26,8 +27,6 @@ public class TestLibrary {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-
-
     }
     /* ADD BOOK TESTS */
     @Test
@@ -51,6 +50,21 @@ public class TestLibrary {
         verify(mockBook,times(1)).getISBN();
         assertEquals(exception.getMessage(), "Invalid ISBN.");
     }
+    @ParameterizedTest
+    @ValueSource(strings = {"11-12","11-1A2","9832-9485398475"})
+    public void givenInvalidISBN_whenAddBook_ThrowException(String invalidISBN) {
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockBook.getISBN()).thenReturn(invalidISBN);
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> library.addBook(mockBook));
+        // 4. Assertion
+        verify(mockBook,times(1)).getISBN();
+        assertEquals(exception.getMessage(), "Invalid ISBN.");
+    }
+    /*
+    // REPLACED WITH PARAMETERIZED TEST ABOVE
     @Test
     public void givenTooShortISBN_whenAddBook_ThrowException() {
         // 1. Arrange
@@ -87,6 +101,8 @@ public class TestLibrary {
         verify(mockBook,times(1)).getISBN();
         assertEquals(exception.getMessage(), "Invalid ISBN.");
     }
+    // REPLACED WITH PARAMETERIZED TEST ABOVE
+    */
     @Test
     public void givenEmptyTitle_whenAddBook_ThrowException() {
         // 1. Arrange
@@ -118,6 +134,42 @@ public class TestLibrary {
         assertEquals(exception.getMessage(), "Invalid title.");
 
     }
+    @ParameterizedTest
+    @ValueSource(strings = {"", "-Bob,", "Lewis Carroll-",
+            "Lewis''Carroll", "Lewis%Carroll", "Lewis--Carroll"})
+    public void givenInvalidAuthorNames_whenAddBook_ThrowException(String author) {
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockBook.getISBN()).thenReturn(ISBN);
+        when(mockBook.getTitle()).thenReturn("Alice In Wonderland");
+        when(mockBook.getAuthor()).thenReturn(author);
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> library.addBook(mockBook));
+        // 4. Assertion
+        verify(mockBook,times(1)).getAuthor();
+        verify(mockBook,times(2)).getTitle();
+        verify(mockBook,times(1)).getISBN();
+        assertEquals(exception.getMessage(), "Invalid author.");
+    }
+    @Test
+    public void givenNullAuthorName_whenAddBook_ThrowException() {
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockBook.getISBN()).thenReturn(ISBN);
+        when(mockBook.getTitle()).thenReturn("Alice In Wonderland");
+        when(mockBook.getAuthor()).thenReturn(null);
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> library.addBook(mockBook));
+        // 4. Assertion
+        verify(mockBook,times(1)).getAuthor();
+        verify(mockBook,times(2)).getTitle();
+        verify(mockBook,times(1)).getISBN();
+        assertEquals(exception.getMessage(), "Invalid author.");
+    }
+/*
+// REPLACED WITH PARAMETERIZED TEST ABOVE
     @Test
     public void givenEmptyAuthorName_whenAddBook_ThrowException() {
         // 1. Arrange
@@ -134,23 +186,6 @@ public class TestLibrary {
         verify(mockBook,times(1)).getISBN();
         assertEquals(exception.getMessage(), "Invalid author.");
 
-    }
-
-    @Test
-    public void givenNullAuthorName_whenAddBook_ThrowException() {
-        // 1. Arrange
-        Library library = new Library(mockDatabaseService, mockReviewService);
-        // 2. Stubbing
-        when(mockBook.getISBN()).thenReturn(ISBN);
-        when(mockBook.getTitle()).thenReturn("Alice In Wonderland");
-        when(mockBook.getAuthor()).thenReturn(null);
-        // 3. Action
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> library.addBook(mockBook));
-        // 4. Assertion
-        verify(mockBook,times(1)).getAuthor();
-        verify(mockBook,times(2)).getTitle();
-        verify(mockBook,times(1)).getISBN();
-        assertEquals(exception.getMessage(), "Invalid author.");
     }
     @Test
     public void givenFirstNonLetterAuthor_whenAddBook_ThrowException() {
@@ -236,6 +271,8 @@ public class TestLibrary {
         verify(mockBook,times(1)).getISBN();
         assertEquals(exception.getMessage(), "Invalid author.");
     }
+  //  REPLACED WITH PARAMETERIZED TEST  ABOVE
+*/
 
     @Test
     public void givenTrueIsBorrowed_whenAddBook_ThrowException() {
@@ -306,6 +343,19 @@ public class TestLibrary {
         // 4. Assertion
         assertEquals(exception.getMessage(), "Invalid ISBN.");
     }
+    @ParameterizedTest
+    @ValueSource(strings = {"11-12","11-1A2","9832-9485398475"})
+    public void givenInvalidISBN_whenBorrowBook_ThrowException() {
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> library.borrowBook("999-1-589-99922-1", userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid ISBN.");
+    }
+    /*
+    // REPLACE IN TEST ABOVE
     @Test
     public void givenTooShortISBN_whenBorrowBook_ThrowException() {
         // 1. Arrange
@@ -326,6 +376,7 @@ public class TestLibrary {
         // 4. Assertion
         assertEquals(exception.getMessage(), "Invalid ISBN.");
     }
+
     @Test
     public void givenInvalidISBN_whenBorrowBook_ThrowException() {
         // 1. Arrange
@@ -336,6 +387,7 @@ public class TestLibrary {
         // 4. Assertion
         assertEquals(exception.getMessage(), "Invalid ISBN.");
     }
+    */
     @Test
     public void givenFailedDBFetch_whenBorrowBook_ThrowException() {
         // 1. Arrange
