@@ -9,6 +9,7 @@ import ac.il.bgu.qa.errors.UserNotRegisteredException;
 import ac.il.bgu.qa.services.*;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
+import org.mockito.internal.matchers.Null;
 
 
 public class TestLibrary {
@@ -21,8 +22,14 @@ public class TestLibrary {
     DatabaseService mockDatabaseService;
     @Mock
     ReviewService mockReviewService;
+
+
+    @Mock
+    NotificationService mockNotificationService;
+
     private final String ISBN= "978-0-545-01022-1";
     private final String userID ="123456789123";
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -442,5 +449,127 @@ public class TestLibrary {
         verify(mockBook,times(1)).isBorrowed();
         verify(mockBook,times(1)).borrow();
         verify(mockDatabaseService,times(1)).borrowBook(ISBN,userID);
+    }
+
+//-------------------------------------------------------------------------------------
+
+    @Test
+    public void givenUserIsNull_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(null));
+        // 4. Assertion
+        assertEquals(exception.getMessage(),"Invalid user.");
+    }
+
+    @Test
+    public void givenUserHasNoId_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getId()).thenReturn(null);
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        verify(mockUser,times(1)).getId();
+        assertEquals(exception.getMessage(), "Invalid user Id.");
+    }
+
+    @Test
+    public void givenUserHasInvalidId_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getId()).thenReturn("4654645");
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        verify(mockUser,times(2)).getId();
+        assertEquals(exception.getMessage(), "Invalid user Id.");
+    }
+
+    @Test
+    public void givenUserHasNoName_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getName()).thenReturn(null);
+        when(mockUser.getId()).thenReturn("123456789012");
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        verify(mockUser,times(2)).getId();
+        verify(mockUser,times(1)).getName();
+        assertEquals(exception.getMessage(), "Invalid user name.");
+    }
+
+    @Test
+    public void givenUserHasEmptyName_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getName()).thenReturn("");
+        when(mockUser.getId()).thenReturn("123456789012");
+        when(mockUser.getNotificationService()).thenReturn(mockNotificationService);
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        verify(mockUser,times(2)).getId();
+        verify(mockUser,times(2)).getName();
+        assertEquals(exception.getMessage(), "Invalid user name.");
+    }
+
+    @Test
+    public void givenUserHasNoNotificationService_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getNotificationService()).thenReturn(null);
+        when(mockUser.getId()).thenReturn("123456789012");
+        when(mockUser.getName()).thenReturn("someName");
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid notification service.");
+        verify(mockUser,times(2)).getId();
+        verify(mockUser,times(2)).getName();
+
+    }
+
+    @Test
+    public void givenUserIsAlreadyInDB_whenRegisterUser_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getId()).thenReturn("123456789012");
+        when(mockDatabaseService.getUserById("123456789012")).thenReturn(mockUser);
+        when(mockUser.getNotificationService()).thenReturn(mockNotificationService);
+        when(mockUser.getName()).thenReturn("someName");
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.registerUser(mockUser));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "User already exists.");
+        verify(mockUser,times(3)).getId();
+        verify(mockUser,times(2)).getName();
+
+    }
+
+    @Test
+    public void givenUserIsValid_whenRegisterUser_thenDontThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockUser.getId()).thenReturn("123456789012");
+        when(mockUser.getNotificationService()).thenReturn(mockNotificationService);
+        when(mockUser.getName()).thenReturn("someName");
+        // 3. Action
+        assertDoesNotThrow(()->library.registerUser(mockUser));
+        // 4. Assertion
+        verify(mockUser,times(4)).getId();
+        verify(mockUser,times(2)).getName();
+
     }
 }
