@@ -705,5 +705,100 @@ public class TestLibrary {
 
     }
 
+    @Test
+    public void givenInvalidISBN_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenInvalidUserId_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenBookIsNotInDataBase_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenUserDoesNotExist_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenNoReviewsForTheBook_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenReviewServiceIsUnavailable_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenNotificationServiceDoesNotWork_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
+
+    @Test
+    public void givenDataIsValid_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+
+        // 4. Assertion
+
+    }
 
 }

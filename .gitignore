@@ -20,3 +20,5 @@ Assignment-1-code/assignment/target/classes/ac/il/bgu/qa/services/NotificationSe
 Assignment-1-code/assignment/target/classes/ac/il/bgu/qa/services/ReviewService.class
 Assignment-1-code/assignment/target/classes/ac/il/bgu/qa/User.class
 Assignment-1-code/assignment/target/test-classes/ac/il/bgu/qa/TestLibrary.class
+.idea/vcs.xml
+.idea/CodeQualityEngineering-Assignment_1.iml
