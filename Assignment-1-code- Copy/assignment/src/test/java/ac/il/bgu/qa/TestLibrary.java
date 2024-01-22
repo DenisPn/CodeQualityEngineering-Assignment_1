@@ -11,6 +11,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.*;
 import org.mockito.internal.matchers.Null;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class TestLibrary {
 
     @Mock
@@ -550,6 +553,118 @@ public class TestLibrary {
         assertDoesNotThrow(()->library.getBookByISBN(ISBN,"012345678912"));
         // 4. Assertion
 
+
+    }
+
+    @Test
+    public void givenInvalidISBN_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.notifyUserWithBookReviews("1234",userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid ISBN.");
+    }
+
+    @Test
+    public void givenInvalidUserId_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.notifyUserWithBookReviews(ISBN,"123"));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid user Id.");
+
+    }
+
+    @Test
+    public void givenBookIsNotInDataBase_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(null);
+        // 3. Action
+        BookNotFoundException exception = assertThrows(BookNotFoundException.class, ()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Book not found!");
+    }
+
+    @Test
+    public void givenUserDoesNotExist_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getUserById(anyString())).thenReturn(null);
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        // 3. Action
+        UserNotRegisteredException exception = assertThrows(UserNotRegisteredException.class, ()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "User not found!");
+    }
+
+    @Test
+    public void givenNoReviewsForTheBook_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getUserById(anyString())).thenReturn(mockUser);
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        when(mockReviewService.getReviewsForBook(anyString())).thenReturn(null);
+
+        // 3. Action
+        NoReviewsFoundException exception = assertThrows(NoReviewsFoundException.class, ()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "No reviews found!");
+    }
+
+    @Test
+    public void givenReviewServiceIsUnavailable_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getUserById(anyString())).thenReturn(mockUser);
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        doThrow(new ReviewException ("Exception")).when(mockReviewService).getReviewsForBook(ISBN);
+        // 3. Action
+        ReviewServiceUnavailableException exception = assertThrows(ReviewServiceUnavailableException.class, ()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Review service unavailable!");
+    }
+
+    @Test
+    public void givenNotificationServiceDoesNotWork_whenNotifyUserWithBookReviews_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getUserById(anyString())).thenReturn(mockUser);
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        List<String> reviews = new LinkedList<>();
+        reviews.add("Some review");
+        when(mockReviewService.getReviewsForBook(ISBN)).thenReturn(reviews);
+        doThrow(new NotificationException ("Exception")).when(mockUser).sendNotification(anyString());
+        // 3. Action
+        NotificationException exception = assertThrows(NotificationException.class, ()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Notification failed!");
+    }
+
+    @Test
+    public void givenDataIsValid_whenNotifyUserWithBookReviews_thenDontThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getUserById(anyString())).thenReturn(mockUser);
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        List<String> reviews = new LinkedList<>();
+        reviews.add("Some review");
+        when(mockReviewService.getReviewsForBook(ISBN)).thenReturn(reviews);
+        // 3. Action
+        assertDoesNotThrow(()->library.notifyUserWithBookReviews(ISBN,userID));
+        // 4. Assertion
 
     }
 
