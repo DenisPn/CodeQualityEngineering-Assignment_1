@@ -471,4 +471,86 @@ public class TestLibrary {
         verify(mockUser,times(2)).getName();
 
     }
+
+
+    @Test
+    public void givenInvalidISBN_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.getBookByISBN("1234","123456789012"));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid ISBN.");
+
+    }
+
+    @Test
+    public void givenNullUserId_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.getBookByISBN(ISBN,null));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid user Id.");
+
+    }
+
+    @Test
+    public void givenInvalidUserId_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+
+        // 3. Action
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()->library.getBookByISBN(ISBN,"1234"));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Invalid user Id.");
+
+    }
+
+    @Test
+    public void givenBookIsNotInDB_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(null);
+        // 3. Action
+        BookNotFoundException exception = assertThrows(BookNotFoundException.class, ()->library.getBookByISBN(ISBN,"012345678912"));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Book not found!");
+
+    }
+
+    @Test
+    public void givenBookIsAlreadyBorrowed_whenGetBookByISBN_thenThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        when(mockBook.isBorrowed()).thenReturn(true);
+        // 3. Action
+        BookAlreadyBorrowedException exception = assertThrows(BookAlreadyBorrowedException.class, ()->library.getBookByISBN(ISBN,"012345678912"));
+        // 4. Assertion
+        assertEquals(exception.getMessage(), "Book was already borrowed!");
+
+    }
+
+    @Test
+    public void givenBookIsValid_whenGetBookByISBN_thenDontThrowException(){
+        // 1. Arrange
+        Library library = new Library(mockDatabaseService, mockReviewService);
+        // 2. Stubbing
+        when(mockDatabaseService.getBookByISBN(anyString())).thenReturn(mockBook);
+        when(mockBook.isBorrowed()).thenReturn(false);
+        // 3. Action
+        assertDoesNotThrow(()->library.getBookByISBN(ISBN,"012345678912"));
+        // 4. Assertion
+
+
+    }
+
 }
